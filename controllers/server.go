@@ -79,7 +79,7 @@ func UpdateNote(c *gin.Context) {
 	models.DB.Model(&note).Updates(input)
 
 	c.JSON(http.StatusOK, gin.H{"data": note})
-	log := models.Log{Act: "C", Stt: http.StatusOK}
+	log := models.Log{Act: "U", Stt: http.StatusOK}
 	jsLog, _ := json.Marshal(log)
 	loggers.PublishMessage(jsLog)
 }
@@ -97,7 +97,7 @@ func DeleteNote(c *gin.Context) {
 	models.DB.Delete(&note)
 
 	c.JSON(http.StatusOK, gin.H{"data": true})
-	log := models.Log{Act: "C", Stt: http.StatusOK}
+	log := models.Log{Act: "D", Stt: http.StatusOK}
 	jsLog, _ := json.Marshal(log)
 	loggers.PublishMessage(jsLog)
 }
