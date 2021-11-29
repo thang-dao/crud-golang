@@ -3,7 +3,6 @@ package controllers
 import (
 	"encoding/json"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/thang-dao/crud-golang/loggers"
@@ -18,20 +17,6 @@ type CreateNoteInput struct {
 type UpdateNoteInput struct {
 	User    string `json:"user"`
 	Content string `json:"content"`
-}
-
-type Log struct {
-	Act      string
-	Stt      int
-	CreateAt time.Time
-}
-
-func CreateLog(Act string, Stt int) Log {
-	var log Log
-	log.Act = Act
-	log.Stt = Stt
-	log.CreateAt = time.Now()
-	return log
 }
 
 func FindNoteByID(c *gin.Context) {
@@ -57,9 +42,9 @@ func CreateNote(c *gin.Context) {
 
 	if err := c.BindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		log := CreateLog("C", http.StatusBadRequest)
+		log := models.Log{Act: "C", Stt: http.StatusBadRequest}
 		jsLog, _ := json.Marshal(log)
-		loggers.Publish(string(jsLog))
+		loggers.PublishMessage(jsLog)
 		return
 	}
 
@@ -67,52 +52,52 @@ func CreateNote(c *gin.Context) {
 	models.DB.Create(&note)
 
 	c.JSON(http.StatusOK, gin.H{"data": note})
-	log := CreateLog("C", http.StatusOK)
+	log := models.Log{Act: "C", Stt: http.StatusOK}
 	jsLog, _ := json.Marshal(log)
-	loggers.Publish(string(jsLog))
+	loggers.PublishMessage(jsLog)
 }
 
 func UpdateNote(c *gin.Context) {
 	var note models.Note
 	if err := models.DB.First(&note, c.Param("ID")).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"data": err.Error()})
-		log := CreateLog("U", http.StatusBadRequest)
+		log := models.Log{Act: "U", Stt: http.StatusBadRequest}
 		jsLog, _ := json.Marshal(log)
-		loggers.Publish(string(jsLog))
+		loggers.PublishMessage(jsLog)
 		return
 	}
 
 	var input UpdateNoteInput
 	if err := c.BindJSON((&input)); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		log := CreateLog("U", http.StatusBadRequest)
+		log := models.Log{Act: "U", Stt: http.StatusBadRequest}
 		jsLog, _ := json.Marshal(log)
-		loggers.Publish(string(jsLog))
+		loggers.PublishMessage(jsLog)
 		return
 	}
 
 	models.DB.Model(&note).Updates(input)
 
 	c.JSON(http.StatusOK, gin.H{"data": note})
-	log := CreateLog("U", http.StatusOK)
+	log := models.Log{Act: "C", Stt: http.StatusOK}
 	jsLog, _ := json.Marshal(log)
-	loggers.Publish(string(jsLog))
+	loggers.PublishMessage(jsLog)
 }
 
 func DeleteNote(c *gin.Context) {
 	var note models.Note
 	if err := models.DB.First(&note, c.Param("ID")).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"data": err.Error()})
-		log := CreateLog("D", http.StatusBadRequest)
+		log := models.Log{Act: "D", Stt: http.StatusBadRequest}
 		jsLog, _ := json.Marshal(log)
-		loggers.Publish(string(jsLog))
+		loggers.PublishMessage(jsLog)
 		return
 	}
 
 	models.DB.Delete(&note)
 
 	c.JSON(http.StatusOK, gin.H{"data": true})
-	log := CreateLog("D", http.StatusOK)
+	log := models.Log{Act: "C", Stt: http.StatusOK}
 	jsLog, _ := json.Marshal(log)
-	loggers.Publish(string(jsLog))
+	loggers.PublishMessage(jsLog)
 }

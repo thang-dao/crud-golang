@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	models.ConnectDatabase()
+	models.ConnectDatabaseNote()
 	log.Print(pkg.AMQP_SERVER_URL)
 	loggers.ConnectRabbitMQ(pkg.AMQP_SERVER_URL, pkg.QUEUE_NAME)
 	router := gin.Default()

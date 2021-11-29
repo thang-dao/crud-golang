@@ -38,7 +38,7 @@ func ConnectRabbitMQ(amqp_server_url string, queue_name string) {
 	CHAN = ch
 }
 
-func Publish(body string) {
+func PublishMessage(body []byte) {
 	err := CHAN.Publish(
 		"",         // exchange
 		QUEUE_NAME, // routing key
@@ -46,7 +46,7 @@ func Publish(body string) {
 		false,      // immediate
 		amqp.Publishing{
 			ContentType: "text/plain",
-			Body:        []byte(body),
+			Body:        body,
 		})
 	if err != nil {
 		panic("Failed to publish a message")
